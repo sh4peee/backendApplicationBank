@@ -1,9 +1,7 @@
 package kalashnikov.v.s.backendapplicationbank.Entity;
 
-import jakarta.persistence.*;
-
 import lombok.Data;
-import java.util.Set;
+import jakarta.persistence.*;
 
 @Entity
 @Data
@@ -12,10 +10,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String email;
-    private String password;
-    private String name;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Account> accounts;
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String role; // USER or ADMIN
 }

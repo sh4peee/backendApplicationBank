@@ -1,8 +1,7 @@
 package kalashnikov.v.s.backendapplicationbank.Entity;
 
-import jakarta.persistence.*;
 import lombok.Data;
-import java.util.Set;
+import jakarta.persistence.*;
 
 @Entity
 @Data
@@ -11,14 +10,14 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String accountNumber;
-    private Double balance;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "account")
-    private Set<Transaction> transactions;
+    @Column(nullable = false, unique = true)
+    private String accountNumber;
+
+    @Column(nullable = false)
+    private Double balance;
 }
 

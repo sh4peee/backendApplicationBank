@@ -8,11 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
+
     @Autowired
     private UserService userService;
 
@@ -23,9 +23,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginUser(@RequestBody User user) {
-        User authenticatedUser = userService.authenticateUser(user.getEmail(), user.getPassword());
-        return ResponseEntity.ok(authenticatedUser);
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        String jwt = userService.authenticateUser(user.getEmail(), user.getPassword());
+        return ResponseEntity.ok(jwt);
     }
 
     @DeleteMapping("/delete/{id}")

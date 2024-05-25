@@ -7,50 +7,54 @@ import kalashnikov.v.s.backendapplicationbank.Entity.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class TransactionService {
-
     @Autowired
     private TransactionDAO transactionDAO;
 
     @Autowired
     private AccountDAO accountDAO;
 
-    public Transaction transferMoney(Long fromAccountId, Long toAccountId, Double amount) {
-        Account fromAccount = accountDAO.findById(fromAccountId).orElseThrow(() -> new RuntimeException("From Account not found"));
-        Account toAccount = accountDAO.findById(toAccountId).orElseThrow(() -> new RuntimeException("To Account not found"));
+    public Transaction transfer(Long fromAccountId, Long toAccountId, BigDecimal amount) {
+        Account fromAccount = accountDAO.findById(fromAccountId);
+        Account toAccount = accountDAO.findById(toAccountId);
 
-        if (fromAccount.getBalance() < amount) {
-            throw new RuntimeException("Insufficient funds");
+        if (fromAccount == null || toAccount == null || fromAccount.getBalance().compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Invalid transaction");
         }
 
-        fromAccount.setBalance(fromAccount.getBalance() - amount);
-        toAccount.setBalance(toAccount.getBalance() + amount);
+        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
+        toAccount.setBalance(toAccount.getBalance().add(amount));
 
         accountDAO.save(fromAccount);
         accountDAO.save(toAccount);
 
         Transaction transaction = new Transaction();
-        transaction.setTimestamp(LocalDateTime.now());
-        transaction.setAmount(amount);
         transaction.setAccount(fromAccount);
-        transaction.setTargetAccount(toAccount);
+        transaction.setAmount(amount.negate());
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setDescription("Transfer to account " + toAccountId);
+        transactionDAO.save(transaction);
 
+        transaction = new Transaction();
+        transaction.setAccount(toAccount);
+        transaction.setAmount(amount);
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setDescription("Transfer from account " + fromAccountId);
         return transactionDAO.save(transaction);
     }
 
-    public List<Transaction> getAllTransactions() {
+    public List<Transaction> findAll() {
         return transactionDAO.findAll();
     }
 
-    public List<Transaction> getTransactionsByUserId(Long userId) {
-        return transactionDAO.findTransactionsByUserId(userId);
-    }
-
-    public List<Transaction> getTransactionsByAccountId(Long accountId) {
+    public List<Transaction> findByAccountId(Long accountId) {
         return transactionDAO.findByAccountId(accountId);
     }
 }

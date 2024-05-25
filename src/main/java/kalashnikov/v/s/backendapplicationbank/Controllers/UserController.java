@@ -3,20 +3,23 @@ package kalashnikov.v.s.backendapplicationbank.Controllers;
 import kalashnikov.v.s.backendapplicationbank.Entity.User;
 import kalashnikov.v.s.backendapplicationbank.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/users")
-public class UserController {
+import javax.validation.Valid;
+import java.util.List;
 
+@RestController
+@RequestMapping("/api/auth")
+public class UserController {
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User savedUser = userService.registerUser(user);
-        return ResponseEntity.ok(savedUser);
+    public ResponseEntity<User> register(@Valid @RequestBody User user) {
+        User registeredUser = userService.register(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
     }
 
     @PostMapping("/login")
@@ -25,9 +28,9 @@ public class UserController {
         return ResponseEntity.ok(authenticatedUser);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,21 +1,26 @@
 package kalashnikov.v.s.backendapplicationbank.Entity;
 
 import lombok.Data;
-import jakarta.persistence.*;
 
-@Entity
+import jakarta.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 @Data
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @NotBlank
+    private String username;
 
-    @Column(nullable = false)
+    @NotBlank
     private String password;
 
-    @Column(nullable = false)
-    private String role; // USER or ADMIN
+    @Email
+    @NotBlank
+    private String email;
 }

@@ -3,41 +3,37 @@ package kalashnikov.v.s.backendapplicationbank.Controllers;
 import kalashnikov.v.s.backendapplicationbank.Entity.Transaction;
 import kalashnikov.v.s.backendapplicationbank.Services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
-
     @Autowired
     private TransactionService transactionService;
 
     @PostMapping("/transfer")
-    public ResponseEntity<Transaction> transferMoney(@RequestParam Long fromAccountId,
-                                                     @RequestParam Long toAccountId,
-                                                     @RequestParam Double amount) {
-        Transaction transaction = transactionService.transferMoney(fromAccountId, toAccountId, amount);
-        return ResponseEntity.ok(transaction);
+    public ResponseEntity<Transaction> transfer(@NotNull @RequestParam Long fromAccountId,
+                                                @NotNull @RequestParam Long toAccountId,
+                                                @NotNull @RequestParam BigDecimal amount) {
+        Transaction transaction = transactionService.transfer(fromAccountId, toAccountId, amount);
+        return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
-        return ResponseEntity.ok(transactions);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByUserId(@PathVariable Long userId) {
-        List<Transaction> transactions = transactionService.getTransactionsByUserId(userId);
+        List<Transaction> transactions = transactionService.findAll();
         return ResponseEntity.ok(transactions);
     }
 
     @GetMapping("/account/{accountId}")
-    public ResponseEntity<List<Transaction>> getTransactionsByAccountId(@PathVariable Long accountId) {
-        List<Transaction> transactions = transactionService.getTransactionsByAccountId(accountId);
-        return ResponseEntity.ok(transactions);
+    public ResponseEntity<List<Transaction>> getAccountTransactions(@PathVariable Long accountId) {
+        List<Transaction> accountTransactions = transactionService.findByAccountId(accountId);
+        return ResponseEntity.ok(accountTransactions);
     }
 }

@@ -3,13 +3,12 @@ package kalashnikov.v.s.backendapplicationbank.DAO;
 import kalashnikov.v.s.backendapplicationbank.Entity.User;
 import kalashnikov.v.s.backendapplicationbank.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 
-@Repository
+@Service
 public class UserDAO {
-
     @Autowired
     private UserRepository userRepository;
 
@@ -21,11 +20,15 @@ public class UserDAO {
         return userRepository.findByEmail(email);
     }
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    public User findById(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 
-    public void delete(User user) {
-        userRepository.delete(user);
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

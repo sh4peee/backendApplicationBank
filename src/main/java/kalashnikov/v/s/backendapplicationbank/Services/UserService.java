@@ -3,19 +3,22 @@ package kalashnikov.v.s.backendapplicationbank.Services;
 import kalashnikov.v.s.backendapplicationbank.DAO.UserDAO;
 import kalashnikov.v.s.backendapplicationbank.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
-public class UserService {
+import jakarta.transaction.Transactional;
+import java.util.List;
 
+@Service
+@Transactional
+public class UserService {
     @Autowired
     private UserDAO userDAO;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
-    public User registerUser(User user) {
+    public User register(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userDAO.save(user);
     }
@@ -28,8 +31,19 @@ public class UserService {
         throw new RuntimeException("Invalid email or password");
     }
 
-    public void deleteUser(Long id) {
-        User user = userDAO.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        userDAO.delete(user);
+    public User findByEmail(String email) {
+        return userDAO.findByEmail(email);
+    }
+
+    public User findById(Long id) {
+        return userDAO.findById(id);
+    }
+
+    public void deleteById(Long id) {
+        userDAO.deleteById(id);
+    }
+
+    public List<User> findAll() {
+        return userDAO.findAll();
     }
 }
